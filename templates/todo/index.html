@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="d-flex justify-content-between">
+    <h1>TODO list</h1>
+    <h5 class="ms-auto my-1"><a class="btn btn-primary" href="{% url "todo:task-create" %}">Create new task</a></h5>
+  </div>
+
+    {% if task_list %}
+        {% for task in task_list %}
+            <div class="container-fluid py-1 px-2">
+                <div class="my-3 row card px-1 py-3 position-relative">
+                  <div class="d-flex justify-content-between">
+                    <h5>{{ task.content }}
+                      {% if task.done %}
+                        <span class="text-success">Completed</span>
+                      {% else %}
+                        <span class="text-danger">Non completed</span>
+                      {% endif %}
+                    </h5>
+                      <form action="{% url 'todo:index' %}" method="POST" class="d-inline">
+                                {% csrf_token %}
+                                <input type="hidden" name="task_id" value="{{ task.id }}">
+                                {% if task.done %}
+                                    <button type="submit" class="btn btn-outline-warning btn-sm">Undo</button>
+                                {% else %}
+                                    <button type="submit" class="btn btn-outline-success btn-sm">Complete</button>
+                                {% endif %}
+                      </form>
+                  </div>
+                    <p class="text-muted">{{ task.datetime }}</p>
+                    <div class="row">
+                        {% for tag in task.tags.all %}
+                            <p class="col-1">{{ tag }}</p>
+                        {% endfor %}
+                        <div class="col-1">
+                            <a href="{% url "todo:task-update" pk=task.id %}" class="btn btn-outline-primary btn-sm">Update</a>
+                        </div>
+                        <div class="col-1">
+                            <a href="{% url "todo:task-delete" pk=task.id %}" class="btn btn-outline-danger btn-sm">Delete</a>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+
+    {% else %}
+        <p>There are no tasks to do.</p>
+    {% endif %}
+{% endblock %}
